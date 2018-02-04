@@ -2,20 +2,280 @@
 <!doctype html>
 <html>
 <head>
-	<title>Node Authentication</title>
-	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> <!-- load bootstrap css -->
-	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
 	<style>
-		body 		{ padding-top:80px; }
+		.centerBox {
+			margin:auto;
+			width: 80%;
+			//border: 3px solid black;
+			padding 10px;
+		}
+		
+		#currencyDisplayArea {
+			padding 10%;
+		}
+		
+		.centeredText {
+			text-align:center;
+		}
 	</style>
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+	<script src="./computeProperties.js"></script>
 </head>
+
 <body>
-<div class="container">
+	<div class="navbar navbar-dark bg-primary">
+		<a class="navbar-brand" href="#page-top">
+			Arbitrage
+			Console</a>
+		<a class="navbar-brand" href="#page-top"> <i class="fab fa-btc"></i></a>
+	</div>
 
-	<h1>Arbitage page</h1>
-    <ul>
 
-    </ul>
+	<!-- Nav tabs -->
+<ul class="nav nav-tabs nav-justified">
+    <li class="nav-item">
+        <a class="nav-link active" data-toggle="tab" href="#panel1" role="tab">Basic</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#panel2" role="tab">Advanced</a>
+    </li>
+</ul>
+
+<div class="tab-content card">
+
+	<div class="tab-pane fade in show active" id="panel1" role="tabpanel">
+		
+			<br>
+
+			<div id='gains' class="display-4 jumbotron centeredText">
+        </div>
+        
+<div class="centerBox">
+			<p style="text-align:center;">Your crypto : </p>
+			<div class="input-group mb-3">
+				<select class="custom-select" id="crypto">
+					<option value='btc'>BTC</option>
+					<option value='eth'>Ethereum</option>
+					<option value='xrp'>Ripple</option>
+					<option value='xmr'>Monero</option>
+					<option value='ltc'>Litecoin</option>
+				</select>
+			</div>
+			<p class="centeredText">Enter your current coin exchange : </p>
+			<div id='from-exchange' class="input-group mb-3">
+				<select class="custom-select exchanges" id="inputGroupSelect01">
+					<option value="1">Exchange 1</option>
+					<option value="2">Exchange 2</option>
+					<option value="3">Exchange 3</option>
+				</select>
+			</div>
+
+			<br>
+			</div>
+			<div id=currencyDisplayArea>
+				<div class="row">
+					<div class="card col-sm-6" style="width: 20rem; padding : 20px;">
+						<div class="card-block">
+							<h4 class="card-title centeredText">Your Exchange</h4>
+							<p id="yourExchange" class="card-text centeredText" style="font-size: 30px;">$80</p>
+						</div>
+					</div>
+					<div class="card col-sm-6" style="width: 20rem; padding : 20px;">
+						<div id="to-exchange" class="card-block">
+							<h4 class="card-title centeredText">Highest Exchange</h4>
+							<p id="otherExchange" class="card-text centeredText" style="font-size: 30px">$91</p>
+
+							<select class="exchanges custom-select" id="inputGroupSelect01">
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<br>
+
+			
+        
+        <br>
+        <br>
+        <br>
+        <br>
+    </div>
+    
+    <div class="centerBox centeredText tab-pane fade in" id="panel2" role="tabpanel">
+    	
+    	<div id='network-fee'>
+				network fee: (measured in <span class='symbol'></span>)
+				<input class="form-control" type=text value="0.00061710"> 
+
+				How much will you sell? (measured in <span class='symbol'></span>)
+				<input class="form-control" id='amount-to-sell' type=text value="1"\>
+				
+			</div>
+			<div id='from-exchange-withdrawl-fee'>
+				% <span class='from-exchange-name'></span> withdrawl fee :
+				<input class="form-control" type=text value="0.01">
+			</div>
+
+
+			<div id='transfer-back-fee'>
+				% Fee to get money back :
+				<input class="form-control" type=text value="0.01">
+			</div>
+
+        <div id='to-exchange-withdrawl-fee'>
+          % <span class='to-exchange-name'></span>
+          withdrawl fee:
+          <input class="form-control" type=text value="0.01">
+        </div>
+        <br>
+
+    </div>
+    
+
 </div>
+
+<script>
+	function computeGains() {
+		let fromPrice = $('#from-exchange select option:selected').attr('price');
+		let toPrice = $('#to-exchange select option:selected').attr('price');
+	  let percent = parseFloat((toPrice - fromPrice) / fromPrice * 100);
+	  
+	  let exchange1Fee = parseFloat($("#from-exchange-withdrawl-fee input").val())/100;
+	  let exchange2Fee = parseFloat($("#to-exchange-withdrawl-fee input").val())/100;
+	  
+	  let networkFee = parseFloat($("#network-fee input").val());
+	  
+	  let transferBackFee = parseFloat($("#transfer-back-fee input").val())/100;
+
+		let wealth = parseFloat($("#amount-to-sell").val());
+	  let newWealth = (wealth * (1 - exchange1Fee) - networkFee) * (1 + (percent / 100.0)) * (1 - exchange2Fee) * (1 - transferBackFee);
+	  
+	  let symbol = $("#crypto").val();
+
+    console.log(fromPrice)
+    console.log(toPrice)
+    console.log(percent)
+    console.log(exchange1Fee)
+    console.log(exchange2Fee)
+    console.log( networkFee )
+    console.log(transferBackFee )
+    console.log(wealth)
+    console.log(newWealth )
+
+    
+
+	  $("#gains").text(((newWealth - wealth) / wealth * 100).toFixed(2) + "% profit to " + newWealth.toFixed(4) + " " + symbol);
+}
+
+function updateStrings() {
+		let from = $('#from-exchange select option:selected').val();
+		let to = $('#to-exchange select option:selected').val();
+		let symbol = $("#crypto").val();
+
+    let fromPrice = parseFloat($('#from-exchange select option:selected').attr("price"));
+    let toPrice = parseFloat($('#to-exchange select option:selected').attr("price"));
+    $("#yourExchange").text("$"+fromPrice.toFixed(2));
+    $("#otherExchange").text("$"+toPrice.toFixed(2));
+
+    console.log("From :"+fromPrice+" To :"+toPrice);
+    if (fromPrice<=toPrice) 
+    {
+      
+      console.log("From<to");
+
+      $("#yourExchange").css("color","red");
+      $("#otherExchange").css("color","green");
+    }
+    else 
+    {
+      
+      console.log("From>to");
+
+      $("#otherExchange").css("color","red");
+      $("#yourExchange").css("color","green");
+    }
+
+
+		$(".symbol").text(symbol);
+		$(".to-exchange-name").text(to);
+		$(".from-exchange-name").text(from);
+}
+
+function fillExchangeData(data) {
+		hideSpinner();
+	  $(".exchanges").empty();
+	  for (let market of data.ticker.markets) {
+		    	let text = market.market + " ($" + parseFloat(market.price).toFixed(2) + ")";
+		    	let $option = $("<option></option>").val(market.market).text(text).attr('price', market.price);
+		      $(".exchanges").append($option);
+		    }
+	  [exchange, _price] = selectBestExchangeToSell();
+	  $("#to-exchange select").val(exchange);
+
+		computeGains();
+	  updateStrings();
+}
+
+function selectBestExchangeToSell() {
+		let $options = $("#to-exchange select option");
+		let maxPrice = -100;
+	  let maxExchange = null;
+		for (let option of $options) {
+			  	let price = parseFloat($(option).attr('price'));
+			    let exchange = $(option).val();
+			  	if (price > maxPrice) {
+					    	maxPrice = price;
+					      maxExchange = exchange;
+					    }
+			  }
+	  return [maxExchange, maxPrice];
+}
+
+function showSpinner() {
+		$(".spinner-region .spinner").removeClass('hidden');
+		$(".spinner-region .replacement").addClass('hidden');
+}
+
+function hideSpinner() {
+		$(".spinner-region .spinner").addClass('hidden');
+		$(".spinner-region .replacement").removeClass('hidden');
+}
+
+function fetchForSymbol(symbol) {
+		showSpinner();
+	  
+	  $.ajax({
+		      dataType: "json",
+		      url: "https://api.cryptonator.com/api/full/" + symbol + "-usd",
+		      success: fillExchangeData,
+		      error: function(err) { console.log("error: ", err); setTimeout(function() { fetchForSymbol(symbol); }, 1500); }
+		    });
+}
+
+$(function() {
+
+  $("#crypto").change(function() {
+    let symbol = $(this).val();
+    fetchForSymbol(symbol);
+});
+
+$("select, input").on("change blur keyup", function() {
+    updateStrings();
+    computeGains();
+});
+
+fetchForSymbol('btc');
+setInterval(function() { fetchForSymbol($("#crypto").val()); }, 5000);
+});
+
+
+</script>
 </body>
+
 </html>
